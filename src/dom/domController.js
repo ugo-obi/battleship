@@ -25,5 +25,13 @@ function addBoardClickHandler(container, callback) {
     });
 }
 
+function markCell(container, coord, result) {
+    const [x, y] = coord;
+    const cell = container.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+    if (!cell) return;
+
+    cell.classList.add(result === `hit` ? `hit` : `miss`);
+}
+
 export default renderBoard;
-export { addBoardClickHandler };
+export { addBoardClickHandler, markCell };

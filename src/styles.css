@@ -27,3 +27,11 @@ body {
     border: 1px solid #333;
     box-sizing: border-box;
 }
+
+.cell.hit {
+    background-color: #e74c3c;
+}
+
+.cell.miss {
+    background-color: #7f8c8d;
+}
