@@ -1,5 +1,5 @@
 
-function renderBoard(container) {
+function renderBoard(container, gameboard, showShips = false) {
     container.innerHTML = "";
     container.classList.add("board");
 
@@ -9,6 +9,15 @@ function renderBoard(container) {
             cell.classList.add("cell");
             cell.dataset.x = x;
             cell.dataset.y = y;
+
+            if (showShips && gameboard) {
+                const ship = gameboard.getShipAt([x, y]);
+                if (ship) {
+                    cell.classList.add('ship');
+                    cell.title = ship.name;
+                }
+            }
+
             container.appendChild(cell);
         }
     }

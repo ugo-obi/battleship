@@ -8,10 +8,9 @@ body {
 }
 
 #app {
-    display: grid;
-    grid-template-columns: repeat(10, 40px);
-    grid-template-rows: repeat(10, 40px);
-    width: fit-content;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
 }
 
 .board {
@@ -34,4 +33,8 @@ body {
 
 .cell.miss {
     background-color: #7f8c8d;
+}
+
+.cell.ship {
+    background-color: mediumseagreen;
 }
