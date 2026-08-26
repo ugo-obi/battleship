@@ -4,7 +4,7 @@ function createGameboard() {
     const missedAttacks = [];
     const attackedCoords = [];
 
-    function placeShip(ship, coordinates) {
+     function placeShip(ship, coordinates) {
         ships.push({ ship, coordinates });
     }
 
