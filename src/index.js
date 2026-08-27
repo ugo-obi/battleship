@@ -3,7 +3,6 @@ import createPlayer from "./factories/Player.js";
 import renderBoard, { addBoardClickHandler, markCell } from "./dom/domController.js";
 import createShip from "./factories/Ship.js";
 
-const boardContainer = document.getElementById("app");
 const playerBoardContainer = document.getElementById('player-board');
 const computerBoardContainer = document.getElementById('computer-board');
 
@@ -58,9 +57,6 @@ function placeRandomShips(player) {
     });
 }
 
-placeDefaultShips(player1);
-placeRandomShips(player2);   // fixed: was placeDefaultShips(player2)
-
 function computerTurn() {
     const coord = player2.randomAttack(player1.gameboard);
     const ship = player1.gameboard.getShipAt(coord);
@@ -75,28 +71,84 @@ function computerTurn() {
     }
 }
 
+// --- Manual placement for player1 ---
+
+const shipsToPlace = [
+    { length: 5, name: 'Carrier' },
+    { length: 4, name: 'Battleship' },
+    { length: 3, name: 'Destroyer' },
+];
+let placingIndex = 0;
+let orientation = 'horizontal';
+
+function getManualCoordinates(startX, startY, length, orient) {
+    const coordinates = [];
+    for (let i = 0; i < length; i += 1) {
+        const x = orient === 'horizontal' ? startX + i : startX;
+        const y = orient === 'horizontal' ? startY : startY + i;
+        coordinates.push([x, y]);
+    }
+    return coordinates;
+}
+
+function isValidPlacement(coordinates, gameboard) {
+    const inBounds = coordinates.every(([x, y]) => x >= 0 && x < 10 && y >= 0 && y < 10);
+    const noOverlap = coordinates.every(([x, y]) => !gameboard.getShipAt([x, y]));
+    return inBounds && noOverlap;
+}
+
+function startGame() {
+    placeRandomShips(player2);
+    renderBoard(computerBoardContainer, player2.gameboard, false);
+
+    addBoardClickHandler(computerBoardContainer, (coord) => {
+        if (gameOver) return;
+        if (currentTurn !== 'player1') return;
+        if (player2.gameboard.wasAttacked(coord)) return;
+
+        const shipBefore = player2.gameboard.getShipAt(coord);
+        player1.attack(player2.gameboard, coord);
+
+        const result = shipBefore ? 'hit' : 'miss';
+        markCell(computerBoardContainer, coord, result);
+
+        if (player2.gameboard.allShipsSunk()) {
+            gameOver = true;
+            alert('You win! All enemy ships have been sunk.');
+            return;
+        }
+
+        currentTurn = 'player2';
+        setTimeout(computerTurn, 500);
+    });
+}
+
 renderBoard(playerBoardContainer, player1.gameboard, true);
-renderBoard(computerBoardContainer, player2.gameboard, false);
 
-addBoardClickHandler(computerBoardContainer, (coord) => {
-    if (gameOver) return;
-    if (currentTurn !== 'player1') return;
-    if (player2.gameboard.wasAttacked(coord)) return;
+addBoardClickHandler(playerBoardContainer, ([x, y]) => {
+    if (placingIndex >= shipsToPlace.length) return;
 
-    const shipBefore = player2.gameboard.getShipAt(coord);
-    player1.attack(player2.gameboard, coord);
+    const { length, name } = shipsToPlace[placingIndex];
+    const coordinates = getManualCoordinates(x, y, length, orientation);
 
-    const result = shipBefore ? 'hit' : 'miss';
-    markCell(computerBoardContainer, coord, result);
-
-    if (player2.gameboard.allShipsSunk()) {
-        gameOver = true;
-        alert('You win! All enemy ships have been sunk.');
+    if (!isValidPlacement(coordinates, player1.gameboard)) {
+        alert('Invalid placement — try a different cell or orientation.');
         return;
     }
 
-    currentTurn = 'player2';
-    setTimeout(computerTurn, 500);
+    const ship = createShip(length, name);
+    player1.gameboard.placeShip(ship, coordinates);
+    renderBoard(playerBoardContainer, player1.gameboard, true);
+
+    placingIndex += 1;
+    if (placingIndex === shipsToPlace.length) {
+        startGame();
+    }
+});
+
+document.getElementById('rotate-btn').addEventListener('click', () => {
+    orientation = orientation === 'horizontal' ? 'vertical' : 'horizontal';
+    console.log(orientation);
 });
 
 console.log(player1);
