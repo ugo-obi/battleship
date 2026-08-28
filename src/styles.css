@@ -38,3 +38,19 @@ body {
 .cell.ship {
     background-color: mediumseagreen;
 }
+
+.ship-piece {
+    display: flex;
+}
+
+.ship-piece .segment {
+    width: 30px;
+    height: 30px;
+    background-color: #7f8c8d;
+    border: 1px solid #333;
+    box-sizing: border-box;
+}
+
+.ship-piece.vertical {
+    flex-direction: column;
+}

@@ -10,6 +10,10 @@ function renderBoard(container, gameboard, showShips = false) {
             cell.dataset.x = x;
             cell.dataset.y = y;
 
+            cell.addEventListener('dragover', (event) => {
+    event.preventDefault();
+});
+
             if (showShips && gameboard) {
                 const ship = gameboard.getShipAt([x, y]);
                 if (ship) {
@@ -22,6 +26,8 @@ function renderBoard(container, gameboard, showShips = false) {
         }
     }
 }
+
+
 
 function addBoardClickHandler(container, callback) {
     container.addEventListener("click", (event) => {

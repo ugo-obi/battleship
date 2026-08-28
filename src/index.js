@@ -124,15 +124,24 @@ function startGame() {
 }
 
 renderBoard(playerBoardContainer, player1.gameboard, true);
+renderStagingArea();
 
-addBoardClickHandler(playerBoardContainer, ([x, y]) => {
-    if (placingIndex >= shipsToPlace.length) return;
+playerBoardContainer.addEventListener('drop', (event) => {
+    event.preventDefault();
+    const cell = event.target.closest('.cell');
+    if (!cell) return;
+
+    const x = Number(cell.dataset.x);
+    const y = Number(cell.dataset.y);
+    const shipIndex = Number(event.dataTransfer.getData('text/plain'));
+
+    if (shipIndex !== placingIndex) return;
 
     const { length, name } = shipsToPlace[placingIndex];
     const coordinates = getManualCoordinates(x, y, length, orientation);
 
     if (!isValidPlacement(coordinates, player1.gameboard)) {
-        alert('Invalid placement — try a different cell or orientation.');
+        alert('Invalid placement');
         return;
     }
 
@@ -141,15 +150,40 @@ addBoardClickHandler(playerBoardContainer, ([x, y]) => {
     renderBoard(playerBoardContainer, player1.gameboard, true);
 
     placingIndex += 1;
+    renderStagingArea();
+
     if (placingIndex === shipsToPlace.length) {
         startGame();
     }
 });
 
+
 document.getElementById('rotate-btn').addEventListener('click', () => {
     orientation = orientation === 'horizontal' ? 'vertical' : 'horizontal';
-    console.log(orientation);
+    renderStagingArea();
 });
 
-console.log(player1);
-console.log(player2);
+function renderStagingArea() {
+    const staging = document.getElementById('ship-staging');
+    staging.innerHTML = '';
+
+    shipsToPlace.slice(placingIndex).forEach((shipDef, i) => {
+        const shipEl = document.createElement('div');
+        shipEl.classList.add('ship-piece');
+        if (orientation === 'vertical') shipEl.classList.add('vertical');
+        shipEl.draggable = true;
+        shipEl.dataset.shipIndex = placingIndex + i;
+
+        for (let s = 0; s < shipDef.length; s += 1) {
+            const segment = document.createElement('div');
+            segment.classList.add('segment');
+            shipEl.appendChild(segment);
+        }
+
+        shipEl.addEventListener('dragstart', (event) => {
+            event.dataTransfer.setData('text/plain', shipEl.dataset.shipIndex);
+        });
+
+        staging.appendChild(shipEl);
+    });
+}
