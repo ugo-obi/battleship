@@ -27,16 +27,16 @@ body {
     box-sizing: border-box;
 }
 
+.cell.ship {
+    background-color: mediumseagreen
+}
+
 .cell.hit {
     background-color: #e74c3c;
 }
 
 .cell.miss {
     background-color: #7f8c8d;
-}
-
-.cell.ship {
-    background-color: mediumseagreen;
 }
 
 .ship-piece {

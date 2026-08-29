@@ -64,6 +64,7 @@ function computerTurn() {
     markCell(playerBoardContainer, coord, result);
     currentTurn = 'player1';
 
+
     if (player1.gameboard.allShipsSunk()) {
         gameOver = true;
         alert('Computer wins! All your ships have been sunk');
